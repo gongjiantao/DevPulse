@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevPulse - 仓库健康度分析仪表盘</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1>
+                <span class="logo-icon">&#x1F4CA;</span>
+                DevPulse
+                <span class="version-badge">v2.0</span>
+            </h1>
+            <p class="subtitle">仓库健康度 &amp; 开发者生产力分析</p>
+            <div class="repo-input-group">
+                <input type="text" id="repo-path" placeholder="输入本地路径或 GitHub 仓库地址（如 github.com/user/repo）" value="." />
+                <button id="analyze-btn" onclick="analyzeRepo()">
+                    <span class="btn-icon">&#x1F50D;</span> 开始分析
+                </button>
+            </div>
+        </div>
+        <div id="status-bar">
+            <span id="status-text">就绪，等待分析</span>
+            <span id="status-indicator" class="indicator idle"></span>
+        </div>
+    </header>
+
+    <main id="dashboard" class="hidden">
+        <section class="overview-section">
+            <div class="card metric-card">
+                <div class="metric-icon">&#x1F4DD;</div>
+                <div class="metric-value" id="commit-count">--</div>
+                <div class="metric-label">提交总数</div>
+            </div>
+            <div class="card metric-card">
+                <div class="metric-icon">&#x1F465;</div>
+                <div class="metric-value" id="contributor-count">--</div>
+                <div class="metric-label">贡献者</div>
+            </div>
+            <div class="card metric-card">
+                <div class="metric-icon">&#x1F4C4;</div>
+                <div class="metric-value" id="file-count">--</div>
+                <div class="metric-label">文件总数</div>
+            </div>
+            <div class="card metric-card">
+                <div class="metric-icon">&#x1F4C8;</div>
+                <div class="metric-value" id="code-lines">--</div>
+                <div class="metric-label">代码行数</div>
+            </div>
+            <div class="card metric-card">
+                <div class="metric-icon">&#x1F33F;</div>
+                <div class="metric-value" id="branch-count">--</div>
+                <div class="metric-label">分支数</div>
+            </div>
+        </section>
+
+        <section class="charts-grid">
+            <div class="card chart-card">
+                <h3>提交活跃度（近90天）</h3>
+                <div class="chart-container">
+                    <canvas id="activity-chart"></canvas>
+                </div>
+            </div>
+            <div class="card chart-card">
+                <h3>代码语言构成</h3>
+                <div class="chart-container">
+                    <canvas id="language-chart"></canvas>
+                </div>
+            </div>
+            <div class="card chart-card">
+                <h3>贡献者排行</h3>
+                <div class="chart-container">
+                    <canvas id="contributor-chart"></canvas>
+                </div>
+            </div>
+            <div class="card chart-card">
+                <h3>代码变更追踪（变更最多的 10 个文件）</h3>
+                <div class="chart-container">
+                    <canvas id="churn-chart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <section class="tables-grid">
+            <div class="card table-card">
+                <h3>语言详情</h3>
+                <div class="table-scroll">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>语言</th>
+                                <th>文件数</th>
+                                <th>代码行</th>
+                                <th>空行</th>
+                                <th>占比</th>
+                            </tr>
+                        </thead>
+                        <tbody id="language-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card table-card">
+                <h3>变更最多的文件</h3>
+                <div class="table-scroll">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>文件</th>
+                                <th class="col-num">+新增</th>
+                                <th class="col-num">−删除</th>
+                                <th class="col-num">净变化</th>
+                                <th class="col-num">提交次数</th>
+                            </tr>
+                        </thead>
+                        <tbody id="churn-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="loading-overlay" class="hidden">
+        <div class="spinner"></div>
+        <p>正在分析仓库...</p>
+    </div>
+
+    <div id="error-toast" class="toast hidden">
+        <span id="error-message"></span>
+    </div>
+
+    <footer>
+        <p>DevPulse v2.0 &mdash; 基于 FastAPI + Chart.js 构建</p>
+    </footer>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
